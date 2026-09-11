@@ -1,13 +1,14 @@
 import { TaskList, TaskListSkeleton, TaskStats } from "@/components/task-list";
 import { EmptyState, ErrorState } from "@/components/states";
-import { serverDataProvider } from "@/lib/server-data-provider";
+import { getServerDataProvider } from "@/lib/server-data-provider";
 
 export const metadata = { title: "Tasks · Developer Command Center" };
 
 export default async function TasksPage() {
   let tasks;
   try {
-    tasks = await serverDataProvider.getTasks();
+    const provider = await getServerDataProvider();
+    tasks = await provider.getTasks();
   } catch (err) {
     return (
       <div className="space-y-4">

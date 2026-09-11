@@ -2,7 +2,7 @@ import { ArrowUpDown } from "lucide-react";
 
 import { EmptyState, ErrorState } from "@/components/states";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { serverDataProvider } from "@/lib/server-data-provider";
+import { getServerDataProvider } from "@/lib/server-data-provider";
 import type { Commit, Issue, PullRequest } from "@/lib/types";
 import { CommitList, IssueList, PullRequestList } from "@/components/feeds";
 
@@ -15,12 +15,13 @@ export async function ListPage({
 }) {
   let data: Commit[] | PullRequest[] | Issue[];
   try {
+    const provider = await getServerDataProvider();
     data =
       kind === "commits"
-        ? await serverDataProvider.getRecentCommits(30)
+        ? await provider.getRecentCommits(30)
         : kind === "pull-requests"
-          ? await serverDataProvider.getOpenPullRequests()
-          : await serverDataProvider.getOpenIssues();
+          ? await provider.getOpenPullRequests()
+          : await provider.getOpenIssues();
   } catch (err) {
     return (
       <div className="space-y-4">

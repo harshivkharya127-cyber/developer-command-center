@@ -5,20 +5,21 @@ import { CommitList, IssueList, PullRequestList } from "@/components/feeds";
 import { RepositoryGrid } from "@/components/repository";
 import { EmptyState, ErrorState } from "@/components/states";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { serverDataProvider } from "@/lib/server-data-provider";
+import { getServerDataProvider } from "@/lib/server-data-provider";
+import type { DataProvider } from "@/lib/data-provider";
 import { compactNumber } from "@/lib/date-utils";
 import { countByStatus, isOverdue } from "@/lib/task-utils";
 
-async function loadDashboard() {
+async function loadDashboard(provider: DataProvider) {
   const [user, repos, commits, pullRequests, issues, contributions, tasks] =
     await Promise.all([
-      serverDataProvider.getCurrentUser(),
-      serverDataProvider.getRepos(),
-      serverDataProvider.getRecentCommits(5),
-      serverDataProvider.getOpenPullRequests(),
-      serverDataProvider.getOpenIssues(),
-      serverDataProvider.getContributions(),
-      serverDataProvider.getTasks(),
+      provider.getCurrentUser(),
+      provider.getRepos(),
+      provider.getRecentCommits(5),
+      provider.getOpenPullRequests(),
+      provider.getOpenIssues(),
+      provider.getContributions(),
+      provider.getTasks(),
     ]);
   return { user, repos, commits, pullRequests, issues, contributions, tasks };
 }
@@ -26,7 +27,8 @@ async function loadDashboard() {
 export default async function DashboardPage() {
   let data: Awaited<ReturnType<typeof loadDashboard>>;
   try {
-    data = await loadDashboard();
+    const provider = await getServerDataProvider();
+    data = await loadDashboard(provider);
   } catch (err) {
     return (
       <ErrorState
