@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { dataProvider } from "@/lib/data-provider";
+import { clientDataProvider } from "@/lib/client-data-provider";
 import { dueDateLabel, relativeTime } from "@/lib/date-utils";
 import {
   filterTasks,
@@ -96,7 +96,7 @@ export function TaskList({ initialTasks }: { initialTasks: Task[] }) {
     setCreating(true);
     setError(null);
     try {
-      const task = await dataProvider.createTask({
+      const task = await clientDataProvider.createTask({
         title: title.trim(),
         status: "todo",
         priority,
@@ -122,7 +122,7 @@ export function TaskList({ initialTasks }: { initialTasks: Task[] }) {
     try {
       const nextStatus: TaskStatus = task.status === "done" ? "todo" : "done";
       setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status: nextStatus } : t)));
-      await dataProvider.updateTask(task.id, { status: nextStatus });
+      await clientDataProvider.updateTask(task.id, { status: nextStatus });
     } catch {
       setTasks((prev) => prev.map((t) => (t.id === task.id ? task : t)));
       setError("Failed to update task. Change reverted.");
@@ -136,7 +136,7 @@ export function TaskList({ initialTasks }: { initialTasks: Task[] }) {
     setError(null);
     try {
       setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status } : t)));
-      await dataProvider.updateTask(task.id, { status });
+      await clientDataProvider.updateTask(task.id, { status });
     } catch {
       setTasks((prev) => prev.map((t) => (t.id === task.id ? task : t)));
       setError("Failed to update task. Change reverted.");
@@ -151,7 +151,7 @@ export function TaskList({ initialTasks }: { initialTasks: Task[] }) {
     const snapshot = tasks;
     try {
       setTasks((prev) => prev.filter((t) => t.id !== task.id));
-      await dataProvider.deleteTask(task.id);
+      await clientDataProvider.deleteTask(task.id);
     } catch {
       setTasks(snapshot);
       setError("Failed to delete task. Please try again.");

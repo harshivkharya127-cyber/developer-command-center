@@ -110,6 +110,11 @@ export class MockDataProvider implements DataProvider {
     return;
   }
 }
-// In a larger app this would come from a config module. Keeping it simple:
-// Phase 4 replaces this with a provider-aware factory.
-export const dataProvider: DataProvider = new MockDataProvider();
+// Provider wiring lives in context-specific factories:
+//  - Server components: @/lib/server-data-provider (serverDataProvider)
+//  - Client components: @/lib/client-data-provider (clientDataProvider)
+// This split keeps server-only modules (next/headers) out of client bundles.
+
+/** Shared GitHub-surfaces provider (mock until the Phase 5 GitHub API provider). */
+export const githubProvider: DataProvider = new MockDataProvider();
+

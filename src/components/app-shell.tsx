@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
 
+import { AuthButton } from "@/components/auth-button";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -58,9 +59,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <span className="text-base font-semibold tracking-tight">Dev Command Center</span>
         </Link>
         <NavLinks />
-        <div className="mt-auto flex items-center justify-between px-2 pt-4">
+        <div className="mt-auto flex items-center justify-between gap-2 px-2 pt-4">
           <span className="text-xs text-muted-foreground">v0.1.0</span>
-          <ModeToggle />
+          <div className="flex items-center gap-1.5">
+            <AuthButton />
+            <ModeToggle />
+          </div>
         </div>
       </aside>
 
@@ -85,7 +89,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </SheetContent>
           </Sheet>
           <span className="text-sm font-semibold tracking-tight">Dev Command Center</span>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-1.5">
+            <AuthButton />
             <ModeToggle />
           </div>
         </header>

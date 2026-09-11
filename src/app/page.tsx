@@ -5,20 +5,20 @@ import { CommitList, IssueList, PullRequestList } from "@/components/feeds";
 import { RepositoryGrid } from "@/components/repository";
 import { EmptyState, ErrorState } from "@/components/states";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { dataProvider } from "@/lib/data-provider";
+import { serverDataProvider } from "@/lib/server-data-provider";
 import { compactNumber } from "@/lib/date-utils";
 import { countByStatus, isOverdue } from "@/lib/task-utils";
 
 async function loadDashboard() {
   const [user, repos, commits, pullRequests, issues, contributions, tasks] =
     await Promise.all([
-      dataProvider.getCurrentUser(),
-      dataProvider.getRepos(),
-      dataProvider.getRecentCommits(5),
-      dataProvider.getOpenPullRequests(),
-      dataProvider.getOpenIssues(),
-      dataProvider.getContributions(),
-      dataProvider.getTasks(),
+      serverDataProvider.getCurrentUser(),
+      serverDataProvider.getRepos(),
+      serverDataProvider.getRecentCommits(5),
+      serverDataProvider.getOpenPullRequests(),
+      serverDataProvider.getOpenIssues(),
+      serverDataProvider.getContributions(),
+      serverDataProvider.getTasks(),
     ]);
   return { user, repos, commits, pullRequests, issues, contributions, tasks };
 }
