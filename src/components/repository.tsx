@@ -1,4 +1,4 @@
-import { ArrowDownRight, ArrowUpRight, GitFork, Lock, Star } from "lucide-react";
+import { GitFork, Lock, Star } from "lucide-react";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
@@ -81,5 +81,3 @@ export function RepositoryGrid({ repos }: { repos: RepoCardModel[] }) {
     </div>
   );
 }
-
-export { ArrowUpRight, ArrowDownRight };

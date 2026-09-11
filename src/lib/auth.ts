@@ -5,17 +5,26 @@ import * as React from "react";
 
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
+// Inlined at build time and identical on server and client, so this can be
+// read during render without hydration-mismatch risk.
+const configured = Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
+
+const GITHUB_SCOPES = "read:user user:email repo";
+
 /** Reactive auth session state for client components. Null when unconfigured/unauthenticated. */
 export function useSession(): { session: Session | null; ready: boolean } {
   const [session, setSession] = React.useState<Session | null>(null);
   const [ready, setReady] = React.useState(false);
 
   React.useEffect(() => {
+    if (!configured) return;
     const supabase = getSupabaseBrowserClient();
-    if (!supabase) {
-      setReady(true);
-      return;
-    }
+    if (!supabase) return;
+
+    // Initial session fetch + live subscription — setState only in callbacks
+    // (never synchronously in the effect body).
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setReady(true);
@@ -29,10 +38,8 @@ export function useSession(): { session: Session | null; ready: boolean } {
     return () => subscription.unsubscribe();
   }, []);
 
-  return { session, ready };
+  return { session, ready: ready || !configured };
 }
-
-const GITHUB_SCOPES = "read:user user:email repo";
 
 /** Start GitHub OAuth. Requires Supabase env vars + GitHub provider enabled. */
 export async function signInWithGitHub(next = "/"): Promise<void> {
@@ -52,9 +59,12 @@ export async function signInWithGitHub(next = "/"): Promise<void> {
   });
 }
 
+/**
+ * Sign out. Navigation afterwards is the caller's responsibility (e.g.
+ * `router.push("/")` from an event handler) so this helper stays hook-free.
+ */
 export async function signOut(): Promise<void> {
   const supabase = getSupabaseBrowserClient();
   if (!supabase) return;
   await supabase.auth.signOut();
-  window.location.href = "/";
 }

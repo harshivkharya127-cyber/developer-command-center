@@ -1,4 +1,5 @@
-import { GitCommitHorizontal, GitFork, GitPullRequest, ListTodo, Star } from "lucide-react";
+import { FolderGit2, GitCommitHorizontal, GitFork, GitPullRequest, ListTodo, Star } from "lucide-react";
+
 
 import { ContributionSection } from "@/components/contribution";
 import { CommitList, IssueList, PullRequestList } from "@/components/feeds";
@@ -44,7 +45,7 @@ export default async function DashboardPage() {
   const totalForks = repos.reduce((sum, r) => sum + r.forks, 0);
 
   const stats = [
-    { label: "Repositories", value: String(repos.length), icon: GitFork },
+    { label: "Repositories", value: String(repos.length), icon: FolderGit2 },
     { label: "Stars earned", value: compactNumber(totalStars), icon: Star },
     { label: "Forks", value: compactNumber(totalForks), icon: GitFork },
     { label: "Open PRs", value: String(pullRequests.length), icon: GitPullRequest },

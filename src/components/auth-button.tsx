@@ -1,6 +1,7 @@
 "use client";
 
 import { LogOut, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 function GithubMark({ className }: { className?: string }) {
   return (
@@ -25,6 +26,7 @@ import { signInWithGitHub, signOut, useSession } from "@/lib/auth";
 /** Header widget: GitHub sign-in button when signed out, avatar menu when signed in. */
 export function AuthButton() {
   const { session, ready } = useSession();
+  const router = useRouter();
 
   if (!ready) {
     return <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />;
@@ -70,7 +72,13 @@ export function AuthButton() {
           <p className="text-xs text-muted-foreground">@{meta.user_name ?? "github"}</p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => signOut()}>
+        <DropdownMenuItem
+          onClick={async () => {
+            await signOut();
+            router.push("/");
+            router.refresh();
+          }}
+        >
           <LogOut className="h-4 w-4" /> Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>

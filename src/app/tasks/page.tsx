@@ -1,4 +1,4 @@
-import { TaskList, TaskListSkeleton, TaskStats } from "@/components/task-list";
+import { TaskList, TaskStats } from "@/components/task-list";
 import { EmptyState, ErrorState } from "@/components/states";
 import { getServerDataProvider } from "@/lib/server-data-provider";
 

@@ -2,11 +2,11 @@
 
 import * as React from "react";
 
-import { EmptyState, ErrorState, LoadingSkeleton } from "@/components/states";
+import { EmptyState } from "@/components/states";
 import { Skeleton } from "@/components/ui/skeleton";
 import { buildHeatmapGrid, contributionLevel } from "@/lib/contribution-utils";
 import { compactNumber } from "@/lib/date-utils";
-import type { Contributions } from "@/lib/types";
+import type { ContributionDay, Contributions } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const LEVEL_STYLES = [
@@ -20,7 +20,17 @@ const LEVEL_STYLES = [
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export function ContributionHeatmap({ data }: { data: Contributions }) {
-  const grid = React.useMemo(() => buildHeatmapGrid(data.byDay, 26), [data.byDay]);
+  // Derive the grid's reference date from the data itself (its most recent
+  // day) instead of the current time — keeps server render and client
+  // hydration identical no matter when either executes.
+  const grid = React.useMemo(() => {
+    const last = data.byDay.reduce<ContributionDay | null>(
+      (acc, d) => (!acc || d.date > acc.date ? d : acc),
+      null
+    );
+    const reference = last ? new Date(`${last.date}T00:00:00Z`) : undefined;
+    return buildHeatmapGrid(data.byDay, 26, reference);
+  }, [data.byDay]);
 
   // Month labels: show label under the column where a month first appears.
   const monthLabels = React.useMemo(() => {
@@ -74,7 +84,7 @@ export function ContributionStats({ data }: { data: Contributions }) {
     { label: "Longest streak", value: `${data.longestStreak}d` },
     {
       label: "Best day",
-      value: `${Math.max(0, ...data.byDay.map((d) => d.count))} commits`,
+      value: `${Math.max(0, ...data.byDay.map((d) => d.count))} contributions`,
     },
   ];
   return (
