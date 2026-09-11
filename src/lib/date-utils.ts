@@ -1,33 +1,51 @@
-import { formatDistanceToNowStrict, format, isToday, isTomorrow, isYesterday } from "date-fns";
+import { format } from "date-fns";
 
-/** "3h ago", "2d ago", "just now" — compact relative timestamps for feeds. */
+const TIME_STEPS: [number, string][] = [
+  [31_536_000, "year"],
+  [2_592_000, "month"],
+  [604_800, "week"],
+  [86_400, "day"],
+  [3_600, "hour"],
+  [60, "minute"],
+];
+
+/**
+ * "3 hours ago", "just now" — compact relative timestamps for feeds.
+ * Fully derived from the (injectable) `now` — no hidden system-clock reads —
+ * so it is deterministic and testable.
+ */
 export function relativeTime(iso: string, now = Date.now()): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "unknown";
-  const diffMs = now - date.getTime();
-  if (diffMs < 45_000) return "just now";
-  return `${formatDistanceToNowStrict(date, { addSuffix: false })} ago`;
+  const diffSec = Math.round((now - date.getTime()) / 1000);
+  if (diffSec < 45) return "just now";
+
+  for (const [stepSecs, unit] of TIME_STEPS) {
+    if (diffSec >= stepSecs) {
+      const value = Math.round(diffSec / stepSecs);
+      return `${value} ${unit}${value === 1 ? "" : "s"} ago`;
+    }
+  }
+  return "just now";
 }
 
-/** Human label for a task due date: "Today", "Tomorrow", "Mar 3", or "Overdue". */
-export function dueDateLabel(
-  dueDate: string | null | undefined,
-  now = new Date()
-): string {
+/**
+ * Human label for a task due date: "Today", "Tomorrow", "Overdue · Sep 10",
+ * a weekday within the next week, or "Nov 1, 2026" beyond that.
+ * Fully derived from the (injectable) `now` — no hidden system-clock reads —
+ * so it is deterministic and testable.
+ */
+export function dueDateLabel(dueDate: string | null | undefined, now = new Date()): string {
   if (!dueDate) return "No due date";
   const date = new Date(`${dueDate}T00:00:00`);
   if (Number.isNaN(date.getTime())) return "Invalid date";
 
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const diffDays = Math.round(
-    (date.getTime() - new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime()) /
-      86_400_000
-  );
+  const diffDays = Math.round((date.getTime() - today.getTime()) / 86_400_000);
 
   if (diffDays < 0) return `Overdue · ${format(date, "MMM d")}`;
-  if (isToday(date)) return "Today";
-  if (isTomorrow(date)) return "Tomorrow";
-  if (isYesterday(date)) return `Yesterday`;
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Tomorrow";
   if (diffDays < 7) return format(date, "EEEE");
   return format(date, "MMM d, yyyy");
 }
