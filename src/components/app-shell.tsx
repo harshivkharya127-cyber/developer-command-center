@@ -88,7 +88,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <NavLinks onNavigate={() => setMobileOpen(false)} />
             </SheetContent>
           </Sheet>
-          <span className="text-sm font-semibold tracking-tight">Dev Command Center</span>
+          <span className="hidden min-[420px]:inline text-sm font-semibold tracking-tight">
+            Dev Command Center
+          </span>
           <div className="ml-auto flex items-center gap-1.5">
             <AuthButton />
             <ModeToggle />

@@ -346,6 +346,7 @@ export function TaskList({ initialTasks }: { initialTasks: Task[] }) {
                     {task.repo ? <span className="font-mono text-[11px]">{task.repo}</span> : null}
                     {task.due_date ? (
                       <span
+                        suppressHydrationWarning
                         className={cn(
                           "flex items-center gap-1",
                           overdue && "font-medium text-destructive"
@@ -355,7 +356,9 @@ export function TaskList({ initialTasks }: { initialTasks: Task[] }) {
                         {dueDateLabel(task.due_date)}
                       </span>
                     ) : null}
-                    <span>· updated {relativeTime(task.updated_at)}</span>
+                    <span suppressHydrationWarning>
+                      · updated {relativeTime(task.updated_at)}
+                    </span>
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
